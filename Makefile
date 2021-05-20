@@ -17,5 +17,8 @@ $(EXECUTABLE): $(OBJECTS)
 release: $(OBJECTS)
 	$(CC) $(LDFLAGS) $(RELFLAGS) $(OBJECTS) -o $(EXECUTABLE)
 
+run: $(EXECUTABLE)
+	./$(EXECUTABLE)
+
 clean:
 	rm -f $(OBJECTS) $(EXECUTABLE)
