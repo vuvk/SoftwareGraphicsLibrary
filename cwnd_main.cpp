@@ -254,18 +254,6 @@ void CWnd_Main::Octahedron(float height)
   //========================================
 }
 //-Функции обработки сообщений класса----------------------------------------
-/*int CWnd_Main::OnCreate(LPCREATESTRUCT lpCreateStruct)
-{
- angle=0;
- SetTimer(100,50,NULL);
- return(CWnd::OnCreate(lpCreateStruct));
-}
-void CWnd_Main::OnDestroy(void)
-{
- KillTimer(100);
- CWnd::OnDestroy();
-}
-*/
 void CWnd_Main::Paint()
 {
  cSGL.Clear(CSGL::SGL_COLOR_BUFFER_BIT|CSGL::SGL_DEPTH_BUFFER_BIT);
@@ -366,6 +354,8 @@ void CWnd_Main::Update()
    default: break;
   }
  }
+
+ angle += 25 * delta_time;
 }
 
 void CWnd_Main::UpdateTimer()
@@ -405,8 +395,6 @@ void CWnd_Main::UpdateTimer()
   sprintf (title, "SGL - FPS: %d", fps);
   SDL_SetWindowTitle (window, title);
  }
-
- angle += 5 * delta_time;
 }
 
 double CWnd_Main::GetDeltaTime()
