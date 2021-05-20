@@ -12,8 +12,12 @@ class CWnd_Main
   CSGL cSGL;
   float angle;
   std::unique_ptr<uint8_t[]> Texture_Ptr;
+ private:
   SDL_Window* window;
-  SDL_Surface* surface;
+  SDL_Renderer* renderer;
+  //SDL_Surface* screen_surface;
+  SDL_Texture* screen_texture;
+  //uint8_t* screen_pixels;
   SDL_Event evt;
   bool quit;
   double delta_time;

@@ -11,14 +11,20 @@ CWnd_Main::CWnd_Main(void)
   return;
  }
 
- window = SDL_CreateWindow("SGL", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, 0);
+ window = SDL_CreateWindow ("SGL", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_OPENGL);
 
- surface = SDL_GetWindowSurface(window);
- if (!surface)
+ //screen_surface = SDL_GetWindowSurface(window);
+ renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+/*
+ screen_surface = SDL_CreateRGBSurface(0, 640, 480, 24, 0, 0, 0, 0);
+ if (!screen_surface)
  {
   fprintf(stderr, "SDL_SetVideoMode() failed: %s\n", SDL_GetError());
   return;
  }
+*/
+ screen_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, 640, 480);
+ //screen_pixels = new uint8_t [640 * 480 * 3];
 
  quit = false;
 
@@ -29,15 +35,15 @@ CWnd_Main::CWnd_Main(void)
  int32_t height;
  //Texture_Ptr.reset(LoadTGAFromFile("texture.tga",width,height));
  //cSGL.BindTexture(width,height,reinterpret_cast<SGLRGBAByteColor*>(Texture_Ptr.get()));
- const uint16_t TESTURE_SIZE_X=8;
- const uint16_t TESTURE_SIZE_Y=8;
+ const uint16_t TEXTURE_SIZE_X=8;
+ const uint16_t TEXTURE_SIZE_Y=8;
  const uint16_t COLOR_SIZE=4;
 
- static uint8_t texture[TESTURE_SIZE_X*TESTURE_SIZE_Y*COLOR_SIZE];
+ static uint8_t texture[TEXTURE_SIZE_X*TEXTURE_SIZE_Y*COLOR_SIZE];
  int16_t index;
- for(uint32_t x=0;x<TESTURE_SIZE_X;x++)
+ for(uint32_t x=0;x<TEXTURE_SIZE_X;x++)
  {
-    for(uint32_t y=0;y<TESTURE_SIZE_Y;y++)
+  for(uint32_t y=0;y<TEXTURE_SIZE_Y;y++)
   {
      uint8_t r=63;
      uint8_t g=64;
@@ -64,7 +70,7 @@ CWnd_Main::CWnd_Main(void)
         }
     index++;
      }
-     uint32_t offset=(x+y*TESTURE_SIZE_X)*COLOR_SIZE;
+     uint32_t offset=(x+y*TEXTURE_SIZE_X)*COLOR_SIZE;
      texture[offset+0]=r;
      texture[offset+1]=g;
      texture[offset+2]=b;
@@ -76,7 +82,9 @@ CWnd_Main::CWnd_Main(void)
 //-Деструктор класса---------------------------------------------------------
 CWnd_Main::~CWnd_Main()
 {
- SDL_FreeSurface(surface);
+ //SDL_FreeSurface(screen_surface);
+ SDL_DestroyTexture (screen_texture);
+ //delete screen_pixels;
  SDL_DestroyWindow(window);
  SDL_Quit();
 }
@@ -260,7 +268,6 @@ void CWnd_Main::OnDestroy(void)
 */
 void CWnd_Main::Paint()
 {
-
  cSGL.Clear(CSGL::SGL_COLOR_BUFFER_BIT|CSGL::SGL_DEPTH_BUFFER_BIT);
  cSGL.MatrixMode(CSGL::SGL_MATRIX_MODELVIEW);
  cSGL.LoadIdentity();
@@ -315,8 +322,27 @@ void CWnd_Main::Paint()
    cSGL.Vertex3f(10,10,0);
   cSGL.End();
 
- //выведем картинку на экран
- SDL_UpdateWindowSurface(window);
+ // выведем картинку на экран
+ //SDL_RenderClear (renderer);
+ /*if (!SDL_LockSurface (screen_surface))
+ {
+  memcpy (screen_surface->pixels, cSGL.ImageMap, 640 * 480 * 3);
+  SDL_UnlockSurface (screen_surface);
+
+  SDL_Texture* screen_texture = SDL_CreateTextureFromSurface (renderer, screen_surface);
+  SDL_RenderCopy (renderer, screen_texture, NULL, NULL);
+  SDL_DestroyTexture (screen_texture);
+ }*/
+
+ int pitch;
+ void* screen_pixels;
+ if (!SDL_LockTexture (screen_texture, NULL, &screen_pixels, &pitch))
+ {
+  memcpy (screen_pixels, cSGL.ImageMap, 640 * 480 * 3);
+  SDL_UnlockTexture (screen_texture);
+  SDL_RenderCopy (renderer, screen_texture, NULL, NULL);
+ }
+ SDL_RenderPresent (renderer);
 }
 
 void CWnd_Main::Update()
@@ -364,16 +390,20 @@ void CWnd_Main::UpdateTimer()
   {
    fps = accumulated_fps;
   }
-
+/*
   if (fps >= 1000 || fps < 0)
   {
    fps  = 1000;
   }
-
+*/
   num_frames = 0;
   accumulated_fps = 0;
 
   framerate_count -= 0.5;
+
+  char title[255] = {0};
+  sprintf (title, "SGL - FPS: %d", fps);
+  SDL_SetWindowTitle (window, title);
  }
 
  angle += 5 * delta_time;
