@@ -1,6 +1,7 @@
 //====================================================================================================
 //подключаемые библиотеки
 //====================================================================================================
+#include <string.h>
 #include "tga.h"
 #include "craiifilein.h"
 #include "craiifileout.h"
@@ -227,17 +228,15 @@ uint8_t *LoadTGAFromFile(const char *file_name,int32_t &width,int32_t &height)
 //----------------------------------------------------------------------------------------------------
 //загрузить tga-файл из ресурсов
 //----------------------------------------------------------------------------------------------------
-uint8_t *LoadTGAFromResource(HMODULE hModule,int32_t id,int32_t &width,int32_t &height)
+uint8_t* LoadTGAFromResource(const char* file_name, int32_t id,int32_t &width,int32_t &height)
 {
- HRSRC hRSRC=FindResource(hModule,(LPSTR)id,RT_RCDATA);
- if (hRSRC==NULL) return(NULL);
- HGLOBAL hGlobal=LoadResource(hModule,hRSRC);
- if (hGlobal==NULL) return(NULL);
- uint8_t *data_ptr=(uint8_t*)LockResource(hGlobal);
- uint32_t data_size=SizeofResource(hModule,hRSRC);
+ FILE* f = fopen (file_name, "rb");
+ fseek (f, 0, SEEK_SET);
+ long size = ftell (f);
+ uint8_t* data_ptr=(uint8_t*)malloc (size);
  //читаем данные
- uint8_t *ret=GetTGAImage(data_ptr,data_size,width,height);
- GlobalUnlock(hGlobal);
+ uint8_t* ret=GetTGAImage(data_ptr, size, width, height);
+ fclose (f);
  return(ret);
 }
 //----------------------------------------------------------------------------------------------------

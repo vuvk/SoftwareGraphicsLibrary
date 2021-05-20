@@ -1,6 +1,6 @@
 C=g++
-CFLAGS=-Wall -c -g -fms-extensions $(shell sdl2-config --cflags)
-LDFLAGS=$(shell sdl2-config --libs) -lm
+CFLAGS=-Wall -c -g -fms-extensions $(shell sdl2-config --cflags) -std=c++11
+LDFLAGS=$(shell sdl2-config --libs) -lm -std=c++11 -lstdc++
 SOURCES=$(shell find . -name "*.cpp")
 OBJECTS=$(SOURCES:.cpp=.o)
 	EXECUTABLE=sgl

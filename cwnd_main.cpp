@@ -1,16 +1,27 @@
+#include <math.h>
 #include "cwnd_main.h"
 #include "tga.h"
 
-//-Функции обработки сообщений класса----------------------------------------
-BEGIN_MESSAGE_MAP(CWnd_Main,CWnd)
- ON_WM_CREATE()
- ON_WM_DESTROY()
- ON_WM_PAINT()
- ON_WM_TIMER()
-END_MESSAGE_MAP()
 //-Конструктор класса--------------------------------------------------------
 CWnd_Main::CWnd_Main(void)
 {
+ if (SDL_Init (SDL_INIT_VIDEO) < 0)
+ {
+  fprintf (stderr, "ERROR: cannot initialize SDL video.\n");
+  return;
+ }
+
+ window = SDL_CreateWindow("SGL", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, 0);
+
+ surface = SDL_GetWindowSurface(window);
+ if (!surface)
+ {
+  fprintf(stderr, "SDL_SetVideoMode() failed: %s\n", SDL_GetError());
+  return;
+ }
+
+ quit = false;
+
  cSGL.Init(640,480);
  cSGL.Perspective(60,(float)(640.0/480.0),1,1000);
  cSGL.SetViewport(0,0,640,480);
@@ -22,6 +33,9 @@ CWnd_Main::CWnd_Main(void)
 //-Деструктор класса---------------------------------------------------------
 CWnd_Main::~CWnd_Main()
 {
+ SDL_FreeSurface(surface);
+ SDL_DestroyWindow(window);
+ SDL_Quit();
 }
 //-Функции класса------------------------------------------------------------
 void CWnd_Main::VectorProduct(float *xv1,float *yv1,float *zv1,float xv2,float yv2,float zv2)
@@ -189,7 +203,7 @@ void CWnd_Main::Octahedron(float height)
   //========================================
 }
 //-Функции обработки сообщений класса----------------------------------------
-int CWnd_Main::OnCreate(LPCREATESTRUCT lpCreateStruct)
+/*int CWnd_Main::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
  angle=0;
  SetTimer(100,50,NULL);
@@ -200,8 +214,10 @@ void CWnd_Main::OnDestroy(void)
  KillTimer(100);
  CWnd::OnDestroy();
 }
-afx_msg void CWnd_Main::OnPaint(void)
+*/
+void CWnd_Main::Paint()
 {
+    /*
  cSGL.Clear(CSGL::SGL_COLOR_BUFFER_BIT|CSGL::SGL_DEPTH_BUFFER_BIT);
  cSGL.MatrixMode(CSGL::SGL_MATRIX_MODELVIEW);
  cSGL.LoadIdentity();
@@ -237,9 +253,9 @@ afx_msg void CWnd_Main::OnPaint(void)
  cSGL.Materialfv(CSGL::SGL_DIFFUSE,m0_diffuse);
  cSGL.Materialfv(CSGL::SGL_SPECULAR,m0_specular); 
  cSGL.Materialfv(CSGL::SGL_EMISSION,m0_emission);
- 
+ */
  //нарисуем фигуру
- Octahedron(10);
+ /*Octahedron(10);
  
   cSGL.Begin();
    cSGL.Color3f(1,1,1);
@@ -255,36 +271,84 @@ afx_msg void CWnd_Main::OnPaint(void)
    cSGL.TexCoordf(1,0);
    cSGL.Vertex3f(10,10,0);
   cSGL.End();
-  
+  */
  //выведем картинку на экран
- CPaintDC dc(this);
-
- BITMAPINFOHEADER bmih;
- bmih.biSize=sizeof(BITMAPINFOHEADER);
- bmih.biWidth=640;
- bmih.biHeight=480;
- bmih.biPlanes=1;
- bmih.biBitCount=24;
- bmih.biCompression=BI_RGB;
- bmih.biSizeImage=0;
- bmih.biXPelsPerMeter=300;
- bmih.biYPelsPerMeter=300;
- bmih.biClrUsed=0;
- bmih.biClrImportant=0;
- BITMAPINFO info;
- info.bmiHeader=bmih;
- StretchDIBits(dc.m_hDC,0,0,640,480,0,0,640,480,cSGL.ImageMap,&info,DIB_RGB_COLORS,SRCCOPY);
-
- CWnd::OnPaint();
+ SDL_UpdateWindowSurface(window);
 }
-afx_msg void CWnd_Main::OnTimer(UINT nIDEvent)
+
+void CWnd_Main::Update()
 {
- if (nIDEvent==100)
+ while (SDL_PollEvent(&evt))
  {
-  angle+=(float)5;
-  InvalidateRect(NULL,FALSE);
+  switch(evt.type)
+  {
+   case SDL_KEYDOWN:
+   {
+    switch (evt.key.keysym.sym)
+    {
+     case SDLK_ESCAPE: quit = true; break;
+     default: break;
+    }
+    break;
+   }
+
+   case SDL_QUIT: quit = true; break;
+
+   default: break;
+  }
  }
- else CWnd::OnTimer(nIDEvent);
+}
+
+void CWnd_Main::UpdateTimer()
+{
+ prevTime = cur_time;
+ cur_time = SDL_GetTicks();
+ //delta_time = (cur_time - prevTime) / 1000.0;
+ delta_time = (cur_time - prevTime) * 0.001;
+ int int_fps = (int)(1.0 / delta_time);
+ framerate_count += delta_time;
+ accumulated_fps += int_fps;
+ ++num_frames;
+
+ //if (num_frames > 60)
+ if (framerate_count >= 0.5)
+ {
+  if (num_frames != 0.0)
+  {
+   fps = accumulated_fps / num_frames;
+  }
+  else
+  {   
+   fps = accumulated_fps;
+  }
+
+  if (fps >= 1000 || fps < 0)
+  {
+   fps  = 1000;
+  }
+
+  num_frames = 0;
+  accumulated_fps = 0;
+
+  framerate_count -= 0.5;
+ }
+
+ angle += 5 * delta_time;
+}
+  
+double CWnd_Main::GetDeltaTime()
+{
+ return delta_time;
+}
+
+int CWnd_Main::GetFps()
+{
+ return fps;
+}
+
+bool CWnd_Main::IsQuit()
+{
+ return quit;
 }
 //-Прочее--------------------------------------------------------------------
 

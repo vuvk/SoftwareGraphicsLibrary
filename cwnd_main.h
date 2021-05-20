@@ -1,17 +1,27 @@
 #ifndef C_WND_MAIN_H
 #define C_WND_MAIN_H
 
-#include "stdafx.h"
+#include "SDL2/SDL.h"
 #include "csgl.h"
 #include <memory>
 
-class CWnd_Main:public CWnd
+class CWnd_Main
 {
  protected:
   //-Переменные класса-------------------------------------------------------
   CSGL cSGL;
   float angle;
   std::unique_ptr<uint8_t[]> Texture_Ptr;
+  SDL_Window* window;
+  SDL_Surface* surface;
+  SDL_Event evt;
+  bool quit;
+  double delta_time;
+  int fps;
+  unsigned int cur_time = 0, prevTime = 0;
+  int accumulated_fps = 0, num_frames = 0;
+  double framerate_count = 0;     
+
   //-Функции класса----------------------------------------------------------
   //-Прочее------------------------------------------------------------------
  public:
@@ -23,14 +33,12 @@ class CWnd_Main:public CWnd
   //-Функции класса----------------------------------------------------------
   void VectorProduct(float *xv1,float *yv1,float *zv1,float xv2,float yv2,float zv2);
   void Octahedron(float height);
-  //-Функции обработки сообщений класса--------------------------------------
-  DECLARE_MESSAGE_MAP()
-  afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-  afx_msg void OnDestroy(void);
-
-  afx_msg void OnPaint(void);
-  afx_msg void OnTimer(UINT nIDEvent);
-
+  void Paint();
+  void Update();
+  void UpdateTimer();
+  double GetDeltaTime();
+  int GetFps();
+  bool IsQuit();
   //-Прочее------------------------------------------------------------------
 };
 #endif

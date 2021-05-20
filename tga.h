@@ -5,7 +5,6 @@
 //подключаемые библиотеки
 //====================================================================================================
 
-#include <windows.h>
 #include <stdio.h>
 #include <stdint.h>
 
@@ -37,7 +36,7 @@ struct STGAHeader
 //====================================================================================================
 
 uint8_t *LoadTGAFromFile(const char *file_name,int32_t &width,int32_t &height);//загрузить tga-файл
-uint8_t *LoadTGAFromResource(HMODULE hModule,int32_t id,int32_t &width,int32_t &height);//загрузить tga-файл из ресурсов
+uint8_t *LoadTGAFromResource(const char* file_name,int32_t id,int32_t &width,int32_t &height);//загрузить tga-файл из ресурсов
 bool SaveTGA(const char *file_name,int32_t width,int32_t height,uint8_t *image);//сохранить картинку в tga-файл
 
 #endif
