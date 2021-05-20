@@ -31,8 +31,8 @@ CWnd_Main::CWnd_Main(void)
  cSGL.Init(640,480);
  cSGL.Perspective(60,(float)(640.0/480.0),1,1000);
  cSGL.SetViewport(0,0,640,480);
- int32_t width;
- int32_t height;
+ //int32_t width;
+ //int32_t height;
  //Texture_Ptr.reset(LoadTGAFromFile("texture.tga",width,height));
  //cSGL.BindTexture(width,height,reinterpret_cast<SGLRGBAByteColor*>(Texture_Ptr.get()));
  const uint16_t TEXTURE_SIZE_X=8;
@@ -142,11 +142,11 @@ void CWnd_Main::Octahedron(float height)
   cSGL.Begin();
    cSGL.TexCoordf(0,0);
    cSGL.Vertex3f(x3,y3,z3);
-     cSGL.Color3f(1,0,1);
-     cSGL.TexCoordf(1,0);
+   cSGL.Color3f(1,0,1);
+   cSGL.TexCoordf(1,0);
    cSGL.Vertex3f(x5,y5,z5);
-     cSGL.Color3f(0,1,0);
-     cSGL.TexCoordf(0,1);
+   cSGL.Color3f(0,1,0);
+   cSGL.TexCoordf(0,1);
    cSGL.Vertex3f(x1,y1,z1);
   cSGL.End();
   //========================================
@@ -159,7 +159,7 @@ void CWnd_Main::Octahedron(float height)
   cSGL.Begin();
    cSGL.TexCoordf(0,0);
    cSGL.Vertex3f(x5,y5,z5);
-     cSGL.TexCoordf(0,1);
+   cSGL.TexCoordf(0,1);
    cSGL.Vertex3f(x4,y4,z4);
    cSGL.TexCoordf(1,0);
    cSGL.Vertex3f(x1,y1,z1);
@@ -307,20 +307,20 @@ void CWnd_Main::Paint()
  //нарисуем фигуру
  Octahedron(10);
 
-  cSGL.Begin();
-   cSGL.Color3f(1,1,1);
-   cSGL.TexCoordf(0,0);
-   cSGL.Vertex3f(-10,10,0);
-   cSGL.Color3f(1,0,1);
-   cSGL.TexCoordf(0,1);
-   cSGL.Vertex3f(-10,-10,0);
-   cSGL.Color3f(1,1,0);
-   cSGL.TexCoordf(1,1);
-   cSGL.Vertex3f(10,-10,0);
-   cSGL.Color3f(0,1,1);
-   cSGL.TexCoordf(1,0);
-   cSGL.Vertex3f(10,10,0);
-  cSGL.End();
+ cSGL.Begin();
+  cSGL.Color3f(1,1,1);
+  cSGL.TexCoordf(0,0);
+  cSGL.Vertex3f(-10,10,0);
+  cSGL.Color3f(1,0,1);
+  cSGL.TexCoordf(0,1);
+  cSGL.Vertex3f(-10,-10,0);
+  cSGL.Color3f(1,1,0);
+  cSGL.TexCoordf(1,1);
+  cSGL.Vertex3f(10,-10,0);
+  cSGL.Color3f(0,1,1);
+  cSGL.TexCoordf(1,0);
+  cSGL.Vertex3f(10,10,0);
+ cSGL.End();
 
  // выведем картинку на экран
  //SDL_RenderClear (renderer);
