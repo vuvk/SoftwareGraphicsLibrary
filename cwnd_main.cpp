@@ -27,8 +27,51 @@ CWnd_Main::CWnd_Main(void)
  cSGL.SetViewport(0,0,640,480);
  int32_t width;
  int32_t height;
- Texture_Ptr.reset(LoadTGAFromFile("texture.tga",width,height));
- cSGL.BindTexture(width,height,reinterpret_cast<SGLRGBAByteColor*>(Texture_Ptr.get()));
+ //Texture_Ptr.reset(LoadTGAFromFile("texture.tga",width,height));
+ //cSGL.BindTexture(width,height,reinterpret_cast<SGLRGBAByteColor*>(Texture_Ptr.get()));
+ const uint16_t TESTURE_SIZE_X=8;
+ const uint16_t TESTURE_SIZE_Y=8;
+ const uint16_t COLOR_SIZE=4;
+
+ static uint8_t texture[TESTURE_SIZE_X*TESTURE_SIZE_Y*COLOR_SIZE];
+ int16_t index;
+ for(uint32_t x=0;x<TESTURE_SIZE_X;x++)
+ {
+    for(uint32_t y=0;y<TESTURE_SIZE_Y;y++)
+  {
+     uint8_t r=63;
+     uint8_t g=64;
+     uint8_t b=127;
+     if ((x+y)%2)
+     {
+        if (index%3==0)
+        {
+     r=255;
+     g=127;
+     b=255;
+        }
+        if (index%3==1)
+        {
+     r=255;
+     g=127;
+     b=127;
+        }
+        if (index%3==2)
+        {
+     r=127;
+     g=255;
+     b=127;
+        }
+    index++;
+     }
+     uint32_t offset=(x+y*TESTURE_SIZE_X)*COLOR_SIZE;
+     texture[offset+0]=r;
+     texture[offset+1]=g;
+     texture[offset+2]=b;
+     texture[offset+3]=255;
+  }
+ }
+ cSGL.BindTexture(8,8,reinterpret_cast<SGLRGBAByteColor*>(texture));
 }
 //-Деструктор класса---------------------------------------------------------
 CWnd_Main::~CWnd_Main()
@@ -217,7 +260,7 @@ void CWnd_Main::OnDestroy(void)
 */
 void CWnd_Main::Paint()
 {
-    /*
+
  cSGL.Clear(CSGL::SGL_COLOR_BUFFER_BIT|CSGL::SGL_DEPTH_BUFFER_BIT);
  cSGL.MatrixMode(CSGL::SGL_MATRIX_MODELVIEW);
  cSGL.LoadIdentity();
@@ -241,7 +284,7 @@ void CWnd_Main::Paint()
  cSGL.Translatef(0,-5,0);
 
  cSGL.MatrixMode(CSGL::SGL_MATRIX_TEXTURE);
- cSGL.LoadIdentity(); 
+ cSGL.LoadIdentity();
  cSGL.Rotatef(angle,0,0,1);
  cSGL.Translatef(-0.5,-0.5,0);
 
@@ -251,12 +294,12 @@ void CWnd_Main::Paint()
  float m0_emission[]={0.1,0.1,0.1};
  cSGL.Materialfv(CSGL::SGL_AMBIENT,m0_ambient);
  cSGL.Materialfv(CSGL::SGL_DIFFUSE,m0_diffuse);
- cSGL.Materialfv(CSGL::SGL_SPECULAR,m0_specular); 
+ cSGL.Materialfv(CSGL::SGL_SPECULAR,m0_specular);
  cSGL.Materialfv(CSGL::SGL_EMISSION,m0_emission);
- */
+
  //нарисуем фигуру
- /*Octahedron(10);
- 
+ Octahedron(10);
+
   cSGL.Begin();
    cSGL.Color3f(1,1,1);
    cSGL.TexCoordf(0,0);
@@ -271,7 +314,7 @@ void CWnd_Main::Paint()
    cSGL.TexCoordf(1,0);
    cSGL.Vertex3f(10,10,0);
   cSGL.End();
-  */
+
  //выведем картинку на экран
  SDL_UpdateWindowSurface(window);
 }
@@ -318,7 +361,7 @@ void CWnd_Main::UpdateTimer()
    fps = accumulated_fps / num_frames;
   }
   else
-  {   
+  {
    fps = accumulated_fps;
   }
 
@@ -335,7 +378,7 @@ void CWnd_Main::UpdateTimer()
 
  angle += 5 * delta_time;
 }
-  
+
 double CWnd_Main::GetDeltaTime()
 {
  return delta_time;
