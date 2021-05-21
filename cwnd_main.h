@@ -15,8 +15,9 @@ class CWnd_Main
  private:
   SDL_Window* window;
   SDL_Renderer* renderer;
+  SDL_Surface* window_surface;
   //SDL_Surface* screen_surface;
-  SDL_Texture* screen_texture;
+  //SDL_Texture* screen_texture;
   //uint8_t* screen_pixels;
   SDL_Event evt;
   bool quit;
