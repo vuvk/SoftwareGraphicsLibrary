@@ -196,6 +196,8 @@ class CSGL
   uint32_t ScreenWidth;//размеры экрана
   uint32_t ScreenHeight;
   float *InvZBuffer;//буфер 1/z
+ private:
+  void* prevImageMap = NULL;
 
  public:
   //-конструктор----------------------------------------------------------------------------------------
@@ -205,6 +207,9 @@ class CSGL
  public:
   //-открытые функции-----------------------------------------------------------------------------------
   void Init(uint32_t screen_width,uint32_t screen_height);//инициализировать
+  bool SetAlternativeImageMap(void* pixels);    // указать альтернативный кусок памяти, куда 
+                                                // рисовать (предварительно должен быть такого же размера и того же формата, что и оригинал
+  bool UnsetAlternativeImageMap();  // вернуть оригинальный кусок памяти для рисования
 
   void LoadIdentity(void);//сделать матрицу единичной
   void Rotatef(float angle,float nx,float ny,float nz);//умножить текущую матрицу на матрицу поворота вокруг вектора

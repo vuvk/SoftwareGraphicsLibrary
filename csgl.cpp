@@ -76,6 +76,7 @@ CSGL::CSGL(void)
 //----------------------------------------------------------------------------------------------------
 CSGL::~CSGL()
 {
+ UnsetAlternativeImageMap ();
  if (ImageMap!=NULL) delete[](ImageMap);
  if (InvZBuffer!=NULL) delete[](InvZBuffer);
 }
@@ -716,6 +717,31 @@ void CSGL::Init(uint32_t screen_width,uint32_t screen_height)
  ScreenHeight=screen_height;
  ImageMap=new CGLScreenColor[screen_width*screen_height];
  InvZBuffer=new float[screen_width*screen_height];
+}
+
+//----------------------------------------------------------------------------------------------------
+// Указать альтернативный кусок памяти
+//----------------------------------------------------------------------------------------------------
+bool CSGL::SetAlternativeImageMap(void* pixels)
+{
+ if (prevImageMap == NULL)
+ {
+  prevImageMap = ImageMap;
+  ImageMap = (CGLScreenColor*) pixels;
+  return true;
+ }
+ return false;
+}
+
+bool CSGL::UnsetAlternativeImageMap()
+{
+ if (prevImageMap != NULL)
+ {
+  ImageMap = (CGLScreenColor*) prevImageMap;
+  prevImageMap = NULL;
+  return true;
+ }
+ return false;
 }
 
 //----------------------------------------------------------------------------------------------------
