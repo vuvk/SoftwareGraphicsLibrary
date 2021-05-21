@@ -13,8 +13,9 @@ CWnd_Main::CWnd_Main(void)
 
  window = SDL_CreateWindow ("SGL", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_OPENGL);
 
- //screen_surface = SDL_GetWindowSurface(window);
- renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+ window_surface = SDL_GetWindowSurface(window);
+
+ renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
 /*
  screen_surface = SDL_CreateRGBSurface(0, 640, 480, 24, 0, 0, 0, 0);
  if (!screen_surface)
@@ -23,7 +24,7 @@ CWnd_Main::CWnd_Main(void)
   return;
  }
 */
- screen_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, 640, 480);
+ //screen_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, 640, 480);
  //screen_pixels = new uint8_t [640 * 480 * 3];
 
  quit = false;
@@ -31,6 +32,7 @@ CWnd_Main::CWnd_Main(void)
  cSGL.Init(640,480);
  cSGL.Perspective(60,(float)(640.0/480.0),1,1000);
  cSGL.SetViewport(0,0,640,480);
+ 
  //int32_t width;
  //int32_t height;
  //Texture_Ptr.reset(LoadTGAFromFile("texture.tga",width,height));
@@ -83,7 +85,7 @@ CWnd_Main::CWnd_Main(void)
 CWnd_Main::~CWnd_Main()
 {
  //SDL_FreeSurface(screen_surface);
- SDL_DestroyTexture (screen_texture);
+ //SDL_DestroyTexture (screen_texture);
  //delete screen_pixels;
  SDL_DestroyWindow(window);
  SDL_Quit();
@@ -256,6 +258,13 @@ void CWnd_Main::Octahedron(float height)
 //-Функции обработки сообщений класса----------------------------------------
 void CWnd_Main::Paint()
 {
+ // альтернативный кусок амяти для рисования (чтоб рисовал сразу в SDL2
+ //int pitch;
+ //void* screen_pixels;
+ //SDL_LockTexture (screen_texture, NULL, &screen_pixels, &pitch);
+ SDL_LockSurface (window_surface);
+ cSGL.SetAlternativeImageMap (window_surface->pixels);
+
  cSGL.Clear(CSGL::SGL_COLOR_BUFFER_BIT|CSGL::SGL_DEPTH_BUFFER_BIT);
  cSGL.MatrixMode(CSGL::SGL_MATRIX_MODELVIEW);
  cSGL.LoadIdentity();
@@ -322,7 +331,9 @@ void CWnd_Main::Paint()
   SDL_DestroyTexture (screen_texture);
  }*/
 
+ /*
  int pitch;
+ 
  void* screen_pixels;
  if (!SDL_LockTexture (screen_texture, NULL, &screen_pixels, &pitch))
  {
@@ -330,7 +341,16 @@ void CWnd_Main::Paint()
   SDL_UnlockTexture (screen_texture);
   SDL_RenderCopy (renderer, screen_texture, NULL, NULL);
  }
+ */
+ /*
+ SDL_UnlockTexture (screen_texture);
+ cSGL.UnsetAlternativeImageMap ();
+ SDL_RenderCopy (renderer, screen_texture, NULL, NULL);
  SDL_RenderPresent (renderer);
+ */
+ SDL_UnlockSurface (window_surface);
+ cSGL.UnsetAlternativeImageMap ();
+ SDL_UpdateWindowSurface (window);
 }
 
 void CWnd_Main::Update()
