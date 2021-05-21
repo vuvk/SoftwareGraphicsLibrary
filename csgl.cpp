@@ -13,7 +13,6 @@
 //****************************************************************************************************
 //константы
 //****************************************************************************************************
-static const float PI=3.1415926535897932384626433832795f;
 
 //****************************************************************************************************
 //макроопределения
@@ -432,10 +431,10 @@ void CSGL::RenderTriangle(SGLNVCTPoint &a,SGLNVCTPoint &b,SGLNVCTPoint &c,SGLScr
  int32_t starty=ap.Y;
  int32_t endy=cp.Y;
  if (starty==endy) return;//нечего рисовать
- if (starty>=ViewPort.Y+ViewPort.H) return;//треугольник не виден
+ if (starty>=ViewPort.Y+ViewPort.W) return;//треугольник не виден
  if (endy<ViewPort.Y) return;//треугольник не виден
  if (starty<ViewPort.Y) starty=ViewPort.Y;
- if (endy>=ViewPort.Y+ViewPort.H) endy=ViewPort.Y+ViewPort.H-1;
+ if (endy>=ViewPort.Y+ViewPort.W) endy=ViewPort.Y+ViewPort.W-1;
 
  //смещаем позицию с учётом обрезания по видовому порту
  float lyca=(cp.Y-ap.Y);
@@ -784,8 +783,8 @@ void CSGL::Rotatef(float angle,float nx,float ny,float nz)
  ny=vector.Y;
  nz=vector.Z;
 
- float cf=cosf(PI/180.0f*angle);
- float sf=sinf(PI/180.0f*angle);
+ float cf=cosf(M_PI/180.0f*angle);
+ float sf=sinf(M_PI/180.0f*angle);
 
  SGLMatrix4 matrix;
 
@@ -902,7 +901,7 @@ void CSGL::SetViewport(float x,float y,float len,float hgt)
 //----------------------------------------------------------------------------------------------------
 void CSGL::Perspective(float fovy,float aspect,float near,float far)
 {
- float top=tanf(PI/180.0f*fovy/2.0f)*near;
+ float top=tanf(M_PI/180.0f*fovy/2.0f)*near;
  float bottom=-top;
  float right=top*aspect;
  float left=-right;
