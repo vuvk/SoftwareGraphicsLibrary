@@ -432,10 +432,10 @@ void CSGL::RenderTriangle(SGLNVCTPoint &a,SGLNVCTPoint &b,SGLNVCTPoint &c,SGLScr
  int32_t starty=ap.Y;
  int32_t endy=cp.Y;
  if (starty==endy) return;//нечего рисовать
- if (starty>=ViewPort.Y+ViewPort.W) return;//треугольник не виден
- if (endy<ViewPort.X) return;//треугольник не виден
- if (starty<ViewPort.X) starty=ViewPort.X;
- if (endy>=ViewPort.Y+ViewPort.W) endy=ViewPort.Y+ViewPort.W-1;
+ if (starty>=ViewPort.Y+ViewPort.H) return;//треугольник не виден
+ if (endy<ViewPort.Y) return;//треугольник не виден
+ if (starty<ViewPort.Y) starty=ViewPort.Y;
+ if (endy>=ViewPort.Y+ViewPort.H) endy=ViewPort.Y+ViewPort.H-1;
 
  //смещаем позицию с учётом обрезания по видовому порту
  float lyca=(cp.Y-ap.Y);
