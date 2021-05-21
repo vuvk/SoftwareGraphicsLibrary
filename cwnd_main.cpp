@@ -12,6 +12,14 @@ CWnd_Main::CWnd_Main(void)
  }
 
  window = SDL_CreateWindow ("SGL", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_OPENGL);
+ 
+ SDL_DisplayMode mode;
+ SDL_GetDisplayMode (0, 0, &mode);
+ mode.format = SDL_PIXELFORMAT_RGBA5551;
+ if (SDL_SetWindowDisplayMode (window, &mode))
+ {
+  fprintf (stderr, "Error - %s\n", SDL_GetError());
+ }
 
  window_surface = SDL_GetWindowSurface(window);
 
