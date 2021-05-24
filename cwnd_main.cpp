@@ -1,6 +1,5 @@
 #include <math.h>
 #include "cwnd_main.h"
-#include "tga.h"
 
 //-Конструктор класса--------------------------------------------------------
 CWnd_Main::CWnd_Main(void)
@@ -24,6 +23,7 @@ CWnd_Main::CWnd_Main(void)
  window_surface = SDL_GetWindowSurface(window);
 
  renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
+ 
 /*
  screen_surface = SDL_CreateRGBSurface(0, 640, 480, 24, 0, 0, 0, 0);
  if (!screen_surface)
@@ -62,23 +62,23 @@ CWnd_Main::CWnd_Main(void)
      {
         if (index%3==0)
         {
-     r=255;
-     g=127;
-     b=255;
+         r=255;
+         g=127;
+         b=255;
         }
         if (index%3==1)
         {
-     r=255;
-     g=127;
-     b=127;
+         r=255;
+         g=127;
+         b=127;
         }
         if (index%3==2)
         {
-     r=127;
-     g=255;
-     b=127;
+         r=127;
+         g=255;
+         b=127;
         }
-    index++;
+     index++;
      }
      uint32_t offset=(x+y*TEXTURE_SIZE_X)*COLOR_SIZE;
      texture[offset+0]=r;
