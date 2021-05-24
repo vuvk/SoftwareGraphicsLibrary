@@ -13,6 +13,8 @@
 //****************************************************************************************************
 //константы
 //****************************************************************************************************
+static const float DEG_TO_RAD_COEFF = M_PI / 180.0f; 
+static const float RAD_TO_DEG_COEFF = 180.0f / M_PI; 
 
 //****************************************************************************************************
 //макроопределения
@@ -378,14 +380,17 @@ void CSGL::DrawTriangle(SGLNVCTPoint A,SGLNVCTPoint B,SGLNVCTPoint C)
  SGLScreenPoint bp;
  SGLScreenPoint cp;
 
- ap.X=(int32_t)((sGLVector4_A_New.X/sGLVector4_A_New.W+1)*ViewPort.Z/2+ViewPort.X);
- ap.Y=(int32_t)((1-sGLVector4_A_New.Y/sGLVector4_A_New.W)*ViewPort.W/2+ViewPort.Y);
+ float half_viewport_z = ViewPort.Z * 0.5f;
+ float half_viewport_w = ViewPort.W * 0.5f;
 
- bp.X=(int32_t)((sGLVector4_B_New.X/sGLVector4_B_New.W+1)*ViewPort.Z/2+ViewPort.X);
- bp.Y=(int32_t)((1-sGLVector4_B_New.Y/sGLVector4_B_New.W)*ViewPort.W/2+ViewPort.Y);
+ ap.X=(int32_t)((sGLVector4_A_New.X/sGLVector4_A_New.W+1) * half_viewport_z + ViewPort.X);
+ ap.Y=(int32_t)((1-sGLVector4_A_New.Y/sGLVector4_A_New.W) * half_viewport_w + ViewPort.Y);
 
- cp.X=(int32_t)((sGLVector4_C_New.X/sGLVector4_C_New.W+1)*ViewPort.Z/2+ViewPort.X);
- cp.Y=(int32_t)((1-sGLVector4_C_New.Y/sGLVector4_C_New.W)*ViewPort.W/2+ViewPort.Y);
+ bp.X=(int32_t)((sGLVector4_B_New.X/sGLVector4_B_New.W+1) * half_viewport_z + ViewPort.X);
+ bp.Y=(int32_t)((1-sGLVector4_B_New.Y/sGLVector4_B_New.W) * half_viewport_w + ViewPort.Y);
+
+ cp.X=(int32_t)((sGLVector4_C_New.X/sGLVector4_C_New.W+1) * half_viewport_z + ViewPort.X);
+ cp.Y=(int32_t)((1-sGLVector4_C_New.Y/sGLVector4_C_New.W) * half_viewport_w + ViewPort.Y);
 
  RenderTriangle(A,B,C,ap,bp,cp);
 }
@@ -440,43 +445,48 @@ void CSGL::RenderTriangle(SGLNVCTPoint &a,SGLNVCTPoint &b,SGLNVCTPoint &c,SGLScr
  float lyca=(cp.Y-ap.Y);
  float lyba=(bp.Y-ap.Y);
  float offset=starty-ap.Y;
+ float inv_lyca = 1.0f / lyca;
+ float inv_lyba = 1.0f / lyba;
  //x
- float dcx1=(cp.X-ap.X)/lyca;
- float dcx2=(bp.X-ap.X)/lyba;
+ float dcx1=(cp.X-ap.X) * inv_lyca;
+ float dcx2=(bp.X-ap.X) * inv_lyba;
  float cx1=ap.X+offset*dcx1;
  float cx2=ap.X+offset*dcx2;
  //z
- float dcz1=(1.0f/c.sGLVertex.Z-1.0f/a.sGLVertex.Z)/lyca;
- float dcz2=(1.0f/b.sGLVertex.Z-1.0f/a.sGLVertex.Z)/lyba;
- float cz1=1.0f/a.sGLVertex.Z+offset*dcz1;
- float cz2=1.0f/a.sGLVertex.Z+offset*dcz2;
+ float inv_a_sglvertex_z = 1.0f / a.sGLVertex.Z;
+ float inv_b_sglvertex_z = 1.0f / b.sGLVertex.Z;
+ float inv_c_sglvertex_z = 1.0f / c.sGLVertex.Z;
+ float dcz1=(inv_c_sglvertex_z-inv_a_sglvertex_z) * inv_lyca;
+ float dcz2=(inv_b_sglvertex_z-inv_a_sglvertex_z) * inv_lyba;
+ float cz1=inv_a_sglvertex_z+offset*dcz1;
+ float cz2=inv_a_sglvertex_z+offset*dcz2;
  //r
- float dcr1=(c.sGLColor.R-a.sGLColor.R)/lyca;
- float dcr2=(b.sGLColor.R-a.sGLColor.R)/lyba;
+ float dcr1=(c.sGLColor.R-a.sGLColor.R) * inv_lyca;
+ float dcr2=(b.sGLColor.R-a.sGLColor.R) * inv_lyba;
  float cr1=a.sGLColor.R+offset*dcr1;
  float cr2=a.sGLColor.R+offset*dcr2;
  //g
- float dcg1=(c.sGLColor.G-a.sGLColor.G)/lyca;
- float dcg2=(b.sGLColor.G-a.sGLColor.G)/lyba;
+ float dcg1=(c.sGLColor.G-a.sGLColor.G) * inv_lyca;
+ float dcg2=(b.sGLColor.G-a.sGLColor.G) * inv_lyba;
  float cg1=a.sGLColor.G+offset*dcg1;
  float cg2=a.sGLColor.G+offset*dcg2;
  //b
- float dcb1=(c.sGLColor.B-a.sGLColor.B)/lyca;
- float dcb2=(b.sGLColor.B-a.sGLColor.B)/lyba;
+ float dcb1=(c.sGLColor.B-a.sGLColor.B) * inv_lyca;
+ float dcb2=(b.sGLColor.B-a.sGLColor.B) * inv_lyba;
  float cb1=a.sGLColor.B+offset*dcb1;
  float cb2=a.sGLColor.B+offset*dcb2;
 
  //u
- float dcu1=(c.sGLTexture.U/c.sGLVertex.Z-a.sGLTexture.U/a.sGLVertex.Z)/lyca;
- float dcu2=(b.sGLTexture.U/b.sGLVertex.Z-a.sGLTexture.U/a.sGLVertex.Z)/lyba;
- float cu1=a.sGLTexture.U/a.sGLVertex.Z+offset*dcu1;
- float cu2=a.sGLTexture.U/a.sGLVertex.Z+offset*dcu2;
+ float dcu1=(c.sGLTexture.U * inv_c_sglvertex_z-a.sGLTexture.U * inv_a_sglvertex_z) * inv_lyca;
+ float dcu2=(b.sGLTexture.U * inv_b_sglvertex_z-a.sGLTexture.U * inv_a_sglvertex_z) * inv_lyba;
+ float cu1=a.sGLTexture.U * inv_a_sglvertex_z+offset*dcu1;
+ float cu2=a.sGLTexture.U * inv_a_sglvertex_z+offset*dcu2;
 
  //v
- float dcv1=(c.sGLTexture.V/c.sGLVertex.Z-a.sGLTexture.V/a.sGLVertex.Z)/lyca;
- float dcv2=(b.sGLTexture.V/b.sGLVertex.Z-a.sGLTexture.V/a.sGLVertex.Z)/lyba;
- float cv1=a.sGLTexture.V/a.sGLVertex.Z+offset*dcv1;
- float cv2=a.sGLTexture.V/a.sGLVertex.Z+offset*dcv2;
+ float dcv1=(c.sGLTexture.V * inv_c_sglvertex_z-a.sGLTexture.V * inv_a_sglvertex_z) * inv_lyca;
+ float dcv2=(b.sGLTexture.V * inv_b_sglvertex_z-a.sGLTexture.V * inv_a_sglvertex_z) * inv_lyba;
+ float cv1=a.sGLTexture.V * inv_a_sglvertex_z+offset*dcv1;
+ float cv2=a.sGLTexture.V * inv_a_sglvertex_z+offset*dcv2;
 
  bool first_half=true;
  SGLNCTPoint sGLNCTPoint_1;
@@ -510,11 +520,10 @@ void CSGL::RenderTriangle(SGLNVCTPoint &a,SGLNVCTPoint &b,SGLNVCTPoint &c,SGLScr
    if (cp.Y==bp.Y)
    {
     x2=bp.X;
-    z2=1.0f/b.sGLVertex.Z;
 
     sGLNCTPoint_2.sGLColor=b.sGLColor;
-    sGLNCTPoint_2.sGLTexture.U=b.sGLTexture.U/b.sGLVertex.Z;
-    sGLNCTPoint_2.sGLTexture.V=b.sGLTexture.V/b.sGLVertex.Z;
+    sGLNCTPoint_2.sGLTexture.U=b.sGLTexture.U * inv_b_sglvertex_z;
+    sGLNCTPoint_2.sGLTexture.V=b.sGLTexture.V * inv_b_sglvertex_z;
    }
    else
    {
@@ -522,26 +531,27 @@ void CSGL::RenderTriangle(SGLNVCTPoint &a,SGLNVCTPoint &b,SGLNVCTPoint &c,SGLScr
        {
      float lycb=(cp.Y-bp.Y);
      float offset=sy-bp.Y;
+     float inv_lycb = 1.0f / lycb;
 
-     dcx2=(cp.X-bp.X)/lycb;
-     dcz2=(1.0f/c.sGLVertex.Z-1.0f/b.sGLVertex.Z)/lycb;
+     dcx2=(cp.X-bp.X) * inv_lycb;
+     dcz2=(inv_c_sglvertex_z-inv_b_sglvertex_z) * inv_lycb;
      cx2=bp.X+offset*dcx2;
-     cz2=1.0f/b.sGLVertex.Z+offset*dcz2;
+     cz2=inv_b_sglvertex_z+offset*dcz2;
 
-     dcr2=(c.sGLColor.R-b.sGLColor.R)/lycb;
+     dcr2=(c.sGLColor.R-b.sGLColor.R) * inv_lycb;
      cr2=b.sGLColor.R+offset*dcr2;
 
-     dcg2=(c.sGLColor.G-b.sGLColor.G)/lycb;
+     dcg2=(c.sGLColor.G-b.sGLColor.G) * inv_lycb;
      cg2=b.sGLColor.G+offset*dcg2;
 
-     dcb2=(c.sGLColor.B-b.sGLColor.B)/lycb;
+     dcb2=(c.sGLColor.B-b.sGLColor.B) * inv_lycb;
      cb2=b.sGLColor.B+offset*dcb2;
 
-     dcu2=(c.sGLTexture.U/c.sGLVertex.Z-b.sGLTexture.U/b.sGLVertex.Z)/lycb;
-     cu2=b.sGLTexture.U/b.sGLVertex.Z+offset*dcu2;
+     dcu2=(c.sGLTexture.U * inv_c_sglvertex_z-b.sGLTexture.U * inv_b_sglvertex_z) * inv_lycb;
+     cu2=b.sGLTexture.U * inv_b_sglvertex_z+offset*dcu2;
 
-     dcv2=(c.sGLTexture.V/c.sGLVertex.Z-b.sGLTexture.V/b.sGLVertex.Z)/lycb;
-     cv2=b.sGLTexture.V/b.sGLVertex.Z+offset*dcv2;
+     dcv2=(c.sGLTexture.V * inv_c_sglvertex_z-b.sGLTexture.V * inv_b_sglvertex_z) * inv_lycb;
+     cv2=b.sGLTexture.V * inv_b_sglvertex_z+offset*dcv2;
 
      first_half=false;
     }
@@ -613,12 +623,13 @@ void CSGL::DrawLine(int32_t y,int32_t x1,int32_t x2,float z1,float z2,const SGLN
  if (x2!=x1)
  {
   float dx=x2-x1;
-  dz=(z2-z1)/dx;
-  dr=(r2-r1)/dx;
-  dg=(g2-g1)/dx;
-  db=(b2-b1)/dx;
-  du=(u2-u1)/dx;
-  dv=(v2-v1)/dx;
+  float inv_dx = 1.0f / dx;
+  dz=(z2-z1) * inv_dx;
+  dr=(r2-r1) * inv_dx;
+  dg=(g2-g1) * inv_dx;
+  db=(b2-b1) * inv_dx;
+  du=(u2-u1) * inv_dx;
+  dv=(v2-v1) * inv_dx;
  }
  if (x2>=ViewPort.X+ViewPort.Z) x2=ViewPort.X+ViewPort.Z-1;
  if (x1<ViewPort.X)
@@ -644,6 +655,7 @@ void CSGL::DrawLine(int32_t y,int32_t x1,int32_t x2,float z1,float z2,const SGLN
 
  //используем линейную интерполяцию текстуры через заданное количество пикселей
  int32_t step=16;//шаг интерполяции
+ float inv_step = 1.0f / step;
  if ((x2-x1)<step) step=x2-x1;
  float dz_step=dz*step;
  float du_step=du*step;
@@ -653,8 +665,8 @@ void CSGL::DrawLine(int32_t y,int32_t x1,int32_t x2,float z1,float z2,const SGLN
  float tv1=v/z;
  float tu2=(u+du_step)/(z+dz_step);
  float tv2=(v+dv_step)/(z+dz_step);
- float dtu=(tu2-tu1)/step;
- float dtv=(tv2-tv1)/step;
+ float dtu=(tu2-tu1) * inv_step;
+ float dtv=(tv2-tv1) * inv_step;
 
  float tu=tu1;
  float tv=tv1;
@@ -675,8 +687,8 @@ void CSGL::DrawLine(int32_t y,int32_t x1,int32_t x2,float z1,float z2,const SGLN
    tv1=v/z;
    tu2=(u+du_step)/(z+dz_step);
    tv2=(v+dv_step)/(z+dz_step);
-   dtu=(tu2-tu1)/step;
-   dtv=(tv2-tv1)/step;
+   dtu=(tu2-tu1) * inv_step;
+   dtv=(tv2-tv1) * inv_step;
   }
   tu+=dtu;
   tv+=dtv;
@@ -783,8 +795,8 @@ void CSGL::Rotatef(float angle,float nx,float ny,float nz)
  ny=vector.Y;
  nz=vector.Z;
 
- float cf=cosf(M_PI/180.0f*angle);
- float sf=sinf(M_PI/180.0f*angle);
+ float cf=cosf(DEG_TO_RAD_COEFF * angle);
+ float sf=sinf(DEG_TO_RAD_COEFF * angle);
 
  SGLMatrix4 matrix;
 
@@ -901,7 +913,7 @@ void CSGL::SetViewport(float x,float y,float len,float hgt)
 //----------------------------------------------------------------------------------------------------
 void CSGL::Perspective(float fovy,float aspect,float near,float far)
 {
- float top=tanf(M_PI/180.0f*fovy/2.0f)*near;
+ float top=tanf(DEG_TO_RAD_COEFF * fovy * 0.5f) * near;
  float bottom=-top;
  float right=top*aspect;
  float left=-right;
