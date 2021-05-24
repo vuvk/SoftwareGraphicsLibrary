@@ -1,6 +1,8 @@
 #include <math.h>
 #include "cwnd_main.h"
 
+void* pixels = NULL;
+
 //-Конструктор класса--------------------------------------------------------
 CWnd_Main::CWnd_Main(void)
 {
@@ -52,6 +54,7 @@ CWnd_Main::CWnd_Main(void)
  //int32_t height;
  //Texture_Ptr.reset(LoadTGAFromFile("texture.tga",width,height));
  //cSGL.BindTexture(width,height,reinterpret_cast<SGLRGBAByteColor*>(Texture_Ptr.get()));
+ /*
  const uint16_t TEXTURE_SIZE_X=8;
  const uint16_t TEXTURE_SIZE_Y=8;
  const uint16_t COLOR_SIZE=4;
@@ -95,6 +98,18 @@ CWnd_Main::CWnd_Main(void)
   }
  }
  cSGL.BindTexture(8,8,reinterpret_cast<SGLRGBAByteColor*>(texture));
+ */
+
+ SDL_Surface* surf = IMG_Load ("head05b_urban_su.png");
+ SDL_Surface* new_surf = SDL_ConvertSurfaceFormat (surf, SDL_PIXELFORMAT_RGBA32, 0);
+ SDL_FreeSurface (surf);
+
+ int size = sizeof (SGLRGBAByteColor) * new_surf->w * new_surf->h;
+ pixels = malloc (size);
+ memcpy (pixels, new_surf->pixels, size);
+
+ cSGL.BindTexture (new_surf->w, new_surf->h, reinterpret_cast<SGLRGBAByteColor*>(pixels));
+ SDL_FreeSurface (new_surf);
 }
 //-Деструктор класса---------------------------------------------------------
 CWnd_Main::~CWnd_Main()
@@ -102,8 +117,10 @@ CWnd_Main::~CWnd_Main()
  //SDL_FreeSurface(screen_surface);
  //SDL_DestroyTexture (screen_texture);
  //delete screen_pixels;
- SDL_DestroyWindow(window);
- SDL_Quit();
+ free (pixels);
+ SDL_DestroyWindow (window);
+ IMG_Quit ();
+ SDL_Quit ();
 }
 //-Функции класса------------------------------------------------------------
 void CWnd_Main::VectorProduct(float *xv1,float *yv1,float *zv1,float xv2,float yv2,float zv2)
@@ -295,8 +312,8 @@ void CWnd_Main::Paint()
  cSGL.Lightfv(CSGL::SGL_LIGHT0,CSGL::SGL_SPECULAR,l0_specular);
  cSGL.Lightfv(CSGL::SGL_LIGHT0,CSGL::SGL_SHININESS,l0_shininess);
 
- cSGL.Enable(CSGL::SGL_LIGHTING);
- cSGL.Enable(CSGL::SGL_LIGHT0);
+ //cSGL.Enable(CSGL::SGL_LIGHTING);
+ //cSGL.Enable(CSGL::SGL_LIGHT0);
 
  cSGL.Translatef(0,0,-25);
  cSGL.Rotatef(angle,1,1,0);
