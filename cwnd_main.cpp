@@ -1,7 +1,7 @@
 #include <math.h>
 #include "cwnd_main.h"
 
-void* pixels = NULL;
+SGLRGBAByteColor* texture = NULL;
 
 //-Конструктор класса--------------------------------------------------------
 CWnd_Main::CWnd_Main(void)
@@ -100,16 +100,10 @@ CWnd_Main::CWnd_Main(void)
  cSGL.BindTexture(8,8,reinterpret_cast<SGLRGBAByteColor*>(texture));
  */
 
- SDL_Surface* surf = IMG_Load ("head05b_urban_su.png");
- SDL_Surface* new_surf = SDL_ConvertSurfaceFormat (surf, SDL_PIXELFORMAT_RGBA32, 0);
- SDL_FreeSurface (surf);
+ int w, h;
+ texture = LoadTexture ("head05b_urban_su.png", &w, &h);
 
- int size = sizeof (SGLRGBAByteColor) * new_surf->w * new_surf->h;
- pixels = malloc (size);
- memcpy (pixels, new_surf->pixels, size);
-
- cSGL.BindTexture (new_surf->w, new_surf->h, reinterpret_cast<SGLRGBAByteColor*>(pixels));
- SDL_FreeSurface (new_surf);
+ cSGL.BindTexture (w, h, texture);
 }
 //-Деструктор класса---------------------------------------------------------
 CWnd_Main::~CWnd_Main()
@@ -117,12 +111,28 @@ CWnd_Main::~CWnd_Main()
  //SDL_FreeSurface(screen_surface);
  //SDL_DestroyTexture (screen_texture);
  //delete screen_pixels;
- free (pixels);
+ delete texture;
  SDL_DestroyWindow (window);
  IMG_Quit ();
  SDL_Quit ();
 }
 //-Функции класса------------------------------------------------------------
+SGLRGBAByteColor* CWnd_Main::LoadTexture (const std::string &path, int* w, int* h)
+{
+ SDL_Surface* surf = IMG_Load (path.c_str ());
+ SDL_Surface* new_surf = SDL_ConvertSurfaceFormat (surf, SDL_PIXELFORMAT_RGBA32, 0);
+ SDL_FreeSurface (surf);
+
+ *w = new_surf->w;
+ *h = new_surf->h;
+ int size = sizeof (SGLRGBAByteColor) * new_surf->w * new_surf->h;
+ SGLRGBAByteColor* pixels = new SGLRGBAByteColor[size];
+ memcpy (pixels, new_surf->pixels, size);
+ SDL_FreeSurface (new_surf);
+
+ return pixels;
+}
+
 void CWnd_Main::VectorProduct(float *xv1,float *yv1,float *zv1,float xv2,float yv2,float zv2)
 {
  float x1=*xv1;

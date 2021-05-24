@@ -37,6 +37,7 @@ class CWnd_Main
   ~CWnd_Main();
   //-Переменные класса-------------------------------------------------------
   //-Функции класса----------------------------------------------------------
+  SGLRGBAByteColor* LoadTexture (const std::string &path, int* w, int* h);  // загрузить текстуру. возвращает массив пикселей и размеры в w,h
   void VectorProduct(float *xv1,float *yv1,float *zv1,float xv2,float yv2,float zv2);
   void Octahedron(float height);
   void Paint();
