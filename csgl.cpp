@@ -89,7 +89,7 @@ CSGL::~CSGL()
 //----------------------------------------------------------------------------------------------------
 //вычислить цвет точки по источникам света
 //----------------------------------------------------------------------------------------------------
-void CSGL::CreateLighColor(SGLNVCTPoint &sGLNVCTPoint)
+void CSGL::CreateLightColor(SGLNVCTPoint &sGLNVCTPoint)
 { 
  sGLNVCTPoint.sGLColor.R=sGLNVCTPoint.sGLMaterial.SGLColor_Emission.R;
  sGLNVCTPoint.sGLColor.G=sGLNVCTPoint.sGLMaterial.SGLColor_Emission.G;
@@ -1002,7 +1002,7 @@ void CSGL::Vertex3f(float x,float y,float z)
  sGLNVCTPoint_Current.sGLVertex.Y=vector_out.Y/vector_out.W;
  sGLNVCTPoint_Current.sGLVertex.Z=vector_out.Z/vector_out.W;
  sGLNVCTPointArray[PointArrayAmount]=sGLNVCTPoint_Current;
- if (EnableLighting==true) CreateLighColor(sGLNVCTPointArray[PointArrayAmount]);//вычисляем освещённость точки для режима работы с источниками света
+ if (EnableLighting==true) CreateLightColor(sGLNVCTPointArray[PointArrayAmount]);//вычисляем освещённость точки для режима работы с источниками света
  PointArrayAmount++;
  //отрисовываем вершины
  if (PointArrayAmount==VERTEX_POINT_ARRAY)//уже есть точки на треугольник

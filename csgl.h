@@ -241,7 +241,7 @@ class CSGL
   static void SetColorValue(SGLColor &sGLColor,float r,float g,float b);//задать цвет
  private:
   //-закрытые функции-----------------------------------------------------------------------------------
-  void CreateLighColor(SGLNVCTPoint &sGLNVCTPoint);//вычислить цвет точки по источникам света
+  void CreateLightColor(SGLNVCTPoint &sGLNVCTPoint);//вычислить цвет точки по источникам света
   void CreateFrustrumPlane(void);//вычислить плоскости отсечения
   void GetIntersectionPlaneAndLine(const SGLNVCTPoint& A,const SGLNVCTPoint& B,SGLNVCTPoint& new_point,float nx,float ny,float nz,float w);//получить точку пересечения прямой и плоскости
   void Clip(const SGLNVCTPoint *point_array_input,uint16_t point_amount_input,SGLNVCTPoint *point_array_output,uint16_t &point_amount_output,float nx,float ny,float nz,float w);//выполнить коррекцию координат
