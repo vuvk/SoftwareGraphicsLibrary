@@ -2,7 +2,7 @@
 C=g++-8
 #C=clang-9
 CFLAGS=-Wall -c -g $(shell sdl2-config --cflags) -std=c++11
-LDFLAGS=$(shell sdl2-config --libs) -lm -std=c++11 -lstdc++
+LDFLAGS=$(shell sdl2-config --libs) -lm -std=c++11 -lstdc++ -lSDL2_image
 RELFLAGS=-s -Ofast -flto -funroll-loops
 SOURCES=$(shell find . -name "*.cpp")
 OBJECTS=$(SOURCES:.cpp=.o)

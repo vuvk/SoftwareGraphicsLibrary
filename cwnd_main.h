@@ -2,6 +2,7 @@
 #define C_WND_MAIN_H
 
 #include "SDL2/SDL.h"
+#include "SDL2/SDL_image.h"
 #include "csgl.h"
 #include <memory>
 

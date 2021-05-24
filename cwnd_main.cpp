@@ -9,7 +9,14 @@ CWnd_Main::CWnd_Main(void)
   fprintf (stderr, "ERROR: cannot initialize SDL video.\n");
   return;
  }
-
+ 
+ if ((IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG) != IMG_INIT_PNG ||
+     (IMG_Init(IMG_INIT_JPG) & IMG_INIT_JPG) != IMG_INIT_JPG)
+ {
+  fprintf (stderr, "Error - %s\n", SDL_GetError());
+  SDL_Quit();
+ }
+ 
  window = SDL_CreateWindow ("SGL", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_OPENGL);
  
  SDL_DisplayMode mode;
