@@ -50,7 +50,7 @@ CWnd_Main::CWnd_Main(void)
  const uint16_t COLOR_SIZE=4;
 
  static uint8_t texture[TEXTURE_SIZE_X*TEXTURE_SIZE_Y*COLOR_SIZE];
- int16_t index;
+ int16_t index=0;
  for(uint32_t x=0;x<TEXTURE_SIZE_X;x++)
  {
   for(uint32_t y=0;y<TEXTURE_SIZE_Y;y++)
@@ -408,12 +408,11 @@ void CWnd_Main::UpdateTimer()
   {
    fps = accumulated_fps;
   }
-/*
-  if (fps >= 1000 || fps < 0)
+  if (fps > 1000 || fps < 0)
   {
    fps  = 1000;
   }
-*/
+
   num_frames = 0;
   accumulated_fps = 0;
 
