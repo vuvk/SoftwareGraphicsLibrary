@@ -57,6 +57,8 @@ class CSGL
    SGL_LIGHT5,//источник света 5
    SGL_LIGHT6,//источник света 6
    SGL_LIGHT7,//источник света 7
+
+   SGL_CULL_FACE // куллинг
   };
   //параметры
   enum PARAM_ID
@@ -66,7 +68,7 @@ class CSGL
    SGL_DIFFUSE,//рассеянный свет
    SGL_SPECULAR,//отражённый свет
    SGL_SHININESS,//уровень отражения
-	 SGL_EMISSION,//уровень излучения
+   SGL_EMISSION,//уровень излучения
    SGL_CONSTANT_ATTENUATION,//постоянное затухание
    SGL_LINEAR_ATTENUATION,//линейное затухание
    SGL_QUADRATIC_ATTENUATION//квадратичное затухание
@@ -83,6 +85,13 @@ class CSGL
   {
    SGL_COLOR_BUFFER_BIT=(1<<0),
    SGL_DEPTH_BUFFER_BIT=(1<<1)
+  };
+  // варианты фейскуллинга
+  enum FACE_MODE
+  {
+   SGL_FRONT,
+   SGL_BACK,
+   SGL_FRONT_AND_BACK
   };
   //-константы------------------------------------------------------------------------------------------
   static const uint8_t MAX_COLOR_VALUE=255;//максимальное значение цвета
@@ -186,6 +195,9 @@ class CSGL
   bool EnableLighting;//разрешение на общий расчёт освещения
   SLight sLight[LIGHT_AMOUNT];//источники света
 
+  bool EnableCulling; // разрешение на куллинг
+  FACE_MODE CullingMode; // режим куллинга
+
   SGLMatrix4 *sGLMatrix4_Ptr;//указатель на матрицу, с которой производится работа
 
   bool DrawMode;//включён ли режим рисования
@@ -232,6 +244,7 @@ class CSGL
   void Enable(ITEM_ID mode);//разрешить
   void Disable(ITEM_ID mode);//запретить
   void Lightfv(ITEM_ID light,PARAM_ID param,float *ptr);//задать параметры источника света
+  void CullFace(FACE_MODE mode);   // задать какие грани отбрасывать
   void Materialfv(PARAM_ID param,float *ptr);//задать параметры материала
 
   //-статические функции--------------------------------------------------------------------------------

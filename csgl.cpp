@@ -71,6 +71,9 @@ CSGL::CSGL(void)
   Lightfv(id,SGL_LINEAR_ATTENUATION,&v);
   Lightfv(id,SGL_QUADRATIC_ATTENUATION,&v);
  }
+
+ Enable (SGL_CULL_FACE);
+ CullFace (SGL_BACK);
 }
 //----------------------------------------------------------------------------------------------------
 //деструктор
@@ -399,6 +402,61 @@ void CSGL::DrawTriangle(SGLNVCTPoint A,SGLNVCTPoint B,SGLNVCTPoint C)
 //----------------------------------------------------------------------------------------------------
 void CSGL::RenderTriangle(SGLNVCTPoint &a,SGLNVCTPoint &b,SGLNVCTPoint &c,SGLScreenPoint &ap,SGLScreenPoint &bp,SGLScreenPoint &cp)
 {
+ // если включено отсечение обеих граней, то смысл тут тусить?
+ if (EnableCulling && CullingMode == SGL_FRONT_AND_BACK)
+ {
+  return;
+ }
+
+ // проверим скалярное произведение вектора взгляда с нормалями треугольника,
+ // и если хоть один параллелен/перпендикулярен, то можно ничего не рисовать
+ if (ViewPort.W != 0) 
+ {
+   if (EnableCulling)
+   {
+    float vx = ViewPort.X / ViewPort.W;
+    float vy = ViewPort.Y / ViewPort.W;
+    float vz = ViewPort.Z / ViewPort.W;
+
+    // проверим a
+    float scalar_a = vx * a.sGLNormal.Nx + 
+                     vy * a.sGLNormal.Ny + 
+                     vz * a.sGLNormal.Nz;
+    // проверим b
+    float scalar_b = vx * b.sGLNormal.Nx + 
+                     vy * b.sGLNormal.Ny + 
+                     vz * b.sGLNormal.Nz;
+    // проверим c
+    float scalar_c = vx * c.sGLNormal.Nx + 
+                     vy * c.sGLNormal.Ny + 
+                     vz * c.sGLNormal.Nz;
+
+    // перпендикулярен? не видно
+    if (scalar_a == 0.0f || scalar_b == 0.0f || scalar_c == 0.0f)
+    {
+     return;
+    }
+  
+    // если видно заднюю сторону, но она должна быть отсечена...
+    if ((CullingMode == SGL_BACK) &&
+        (scalar_a > 0 || scalar_b > 0 || scalar_c > 0))
+    {
+     return;
+    }
+    // если смотришь на лицевую, но она должна быть отсечена...
+    if ((CullingMode == SGL_FRONT) &&
+        (scalar_a < 0 || scalar_b < 0 || scalar_c < 0))
+    {
+     return;
+    }
+   }
+ }
+ else
+ {
+  return;
+ }
+ 
+ 
  SGLNVCTPoint tmp_point;
  SGLScreenPoint tmp_screen;
  if (ap.Y>cp.Y)
@@ -1061,6 +1119,8 @@ void CSGL::Enable(ITEM_ID mode)
  if (mode==SGL_LIGHT5) sLight[5].Enabled=true;
  if (mode==SGL_LIGHT6) sLight[6].Enabled=true;
  if (mode==SGL_LIGHT7) sLight[7].Enabled=true;
+
+ if (mode==SGL_CULL_FACE) EnableCulling = true;
 }
 //----------------------------------------------------------------------------------------------------
 //запретить
@@ -1076,6 +1136,8 @@ void CSGL::Disable(ITEM_ID mode)
  if (mode==SGL_LIGHT5) sLight[5].Enabled=false;
  if (mode==SGL_LIGHT6) sLight[6].Enabled=false;
  if (mode==SGL_LIGHT7) sLight[7].Enabled=false;
+
+ if (mode==SGL_CULL_FACE) EnableCulling = false;
 }
 //----------------------------------------------------------------------------------------------------
 //задать параметры источника света
@@ -1156,6 +1218,15 @@ void CSGL::Lightfv(ITEM_ID light,PARAM_ID param,float *ptr)
   return;
  }
 }
+
+//----------------------------------------------------------------------------------------------------
+// задать какие грани отбрасывать
+//----------------------------------------------------------------------------------------------------
+void CSGL::CullFace(FACE_MODE mode)   
+{
+ CullingMode = mode;
+}
+
 //----------------------------------------------------------------------------------------------------
 //задать параметры материала
 //----------------------------------------------------------------------------------------------------

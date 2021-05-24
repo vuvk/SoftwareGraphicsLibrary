@@ -102,8 +102,10 @@ CWnd_Main::CWnd_Main(void)
 
  int w, h;
  texture = LoadTexture ("head05b_urban_su.png", &w, &h);
-
  cSGL.BindTexture (w, h, texture);
+
+ cSGL.Enable (CSGL::SGL_CULL_FACE);
+ cSGL.CullFace (CSGL::SGL_FRONT);
 }
 //-Деструктор класса---------------------------------------------------------
 CWnd_Main::~CWnd_Main()
